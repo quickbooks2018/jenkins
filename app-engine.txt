@@ -1,0 +1,41 @@
+# Python Sample app
+
+# https://cloud.google.com/appengine/docs/flexible/testing-and-deploying-your-app?tab=python
+
+# https://cloud.google.com/error-reporting/docs/check-app-crash
+
+git clone https://github.com/GoogleCloudPlatform/python-docs-samples
+
+cd python-docs-samples/appengine/standard_python3/hello_world
+
+gcloud app deploy --project playground-s-11-6af822fe # https://cloud.google.com/appengine/docs/flexible/reference/app-yaml?tab=python#service  (Note: in app.yaml define service: cloudgeeks) # deploy with default & then name it.
+
+runtime: python39
+service: cloudgeeks
+
+gcloud app browse --project playground-s-11-6af822fe
+
+
+################
+# App Engine Cli
+################
+# https://cloud.google.com/sdk/gcloud/reference/app/versions 
+
+gcloud app versions list --project playground-s-11-6af822fe
+
+gcloud app versions list --filter=TRAFFIC_SPLIT=0 --project playground-s-11-6af822fe
+
+
+
+#!/bin/bash
+# https://stackoverflow.com/questions/58815968/how-do-i-filter-latest-app-engine-version-from-all-of-the-versions-using-gcloud
+
+PROJECT='playground-s-11-6af822fe'
+Zero_Traffic=$(gcloud app versions list --filter="traffic_split=0" --format="table(version.id)" --project $PROJECT | tail -n +2)
+for row in $Zero_Traffic
+do
+  echo  $row
+  yes | gcloud app versions delete $row --project $PROJECT
+done
+
+# End
