@@ -1,0 +1,32 @@
+
+pipeline {
+  agent {
+    docker { image 'google/cloud-sdk:latest' }
+  }
+   environment {
+    CLOUDSDK_CORE_PROJECT='playground-s-11-95313832'
+    CLIENT_EMAIL='655731094019-compute@developer.gserviceaccount.com'
+    GCLOUD_CREDS=credentials('gcloud-creds')
+  }
+  stages {
+    stage('Gcloud Auth') {
+      steps {
+        sh '''
+          gcloud version
+          gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"
+          echo "my project id is $CLOUDSDK_CORE_PROJECT"
+          gcloud compute zones list
+        '''
+      }
+    }
+  }
+
+ post {
+    always {
+      sh 'gcloud auth revoke $CLIENT_EMAIL'
+    }
+   }
+
+
+
+}
