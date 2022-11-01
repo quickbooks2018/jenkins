@@ -7,7 +7,8 @@ pipeline {
     CLOUDSDK_CORE_PROJECT='playground-s-11-95313832'
     CLIENT_EMAIL='655731094019-compute@developer.gserviceaccount.com'
     GCLOUD_CREDS=credentials('gcloud-creds')
-  }
+    }
+
   stages {
     stage('Gcloud Auth') {
       steps {
@@ -16,10 +17,44 @@ pipeline {
           gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"
           echo "my project id is $CLOUDSDK_CORE_PROJECT"
           gcloud compute zones list
+          Zero_Traffic=$(gcloud app versions list --filter="traffic_split=0" --format="table(version.id)" --project $CLOUDSDK_CORE_PROJECT | tail -n +2)
+          export Zero_Traffic
+          for row in $Zero_Traffic
+            do
+              echo  $row
+              yes | gcloud app versions delete $row --project $CLOUDSDK_CORE_PROJECT
+            done
         '''
       }
     }
+
+     stage('Gcloud Compute') {
+      steps {
+        sh '''
+          gcloud compute zones list
+        '''
+      }
+    }
+
+     stage('Gcloud App Engine') {
+      steps {
+        sh '''
+          Zero_Traffic=$(gcloud app versions list --filter="traffic_split=0" --format="table(version.id)" --project $CLOUDSDK_CORE_PROJECT | tail -n +2)
+          export Zero_Traffic
+          for row in $Zero_Traffic
+            do
+              echo  $row
+              yes | gcloud app versions delete $row --project $CLOUDSDK_CORE_PROJECT
+            done
+        '''
+      }
+    }
+
+
+
+
   }
+
 
  post {
     always {
