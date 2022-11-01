@@ -17,13 +17,6 @@ pipeline {
           gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"
           echo "my project id is $CLOUDSDK_CORE_PROJECT"
           gcloud compute zones list
-          Zero_Traffic=$(gcloud app versions list --filter="traffic_split=0" --format="table(version.id)" --project $CLOUDSDK_CORE_PROJECT | tail -n +2)
-          export Zero_Traffic
-          for row in $Zero_Traffic
-            do
-              echo  $row
-              yes | gcloud app versions delete $row --project $CLOUDSDK_CORE_PROJECT
-            done
         '''
       }
     }
